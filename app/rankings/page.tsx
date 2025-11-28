@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
-import { QRGallery } from "@/components/qr/qr-gallery"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
+import { RankingsContent } from "@/components/rankings/rankings-content"
 
-export default async function QRCodesPage() {
+export default async function RankingsPage() {
   const user = await getCurrentUser()
 
   if (!user) {
@@ -20,12 +20,12 @@ export default async function QRCodesPage() {
       />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground">Galerie QR Codes</h1>
+          <h1 className="text-2xl font-bold text-foreground">Classements</h1>
           <p className="text-muted-foreground">
-            Gérez vos QR codes, suivez leurs performances et partagez-les facilement
+            Découvrez vos QR codes les plus performants et vos meilleurs reviewers
           </p>
         </div>
-        <QRGallery />
+        <RankingsContent />
       </main>
     </div>
   )

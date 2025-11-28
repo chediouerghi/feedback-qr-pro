@@ -1,13 +1,14 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
 import { StarRating } from "./star-rating"
-import { CheckCircle, Loader2, AlertCircle, MessageSquare } from "lucide-react"
+import { CheckCircle, Loader2, AlertCircle, MessageSquare, User, Mail } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface FeedbackFormProps {
@@ -21,6 +22,8 @@ type FormState = "idle" | "submitting" | "success" | "error"
 export function FeedbackForm({ qrUrl, qrName, qrLocation }: FeedbackFormProps) {
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState("")
+  const [reviewerName, setReviewerName] = useState("")
+  const [reviewerEmail, setReviewerEmail] = useState("")
   const [formState, setFormState] = useState<FormState>("idle")
   const [errorMessage, setErrorMessage] = useState("")
 
@@ -35,7 +38,12 @@ export function FeedbackForm({ qrUrl, qrName, qrLocation }: FeedbackFormProps) {
       const res = await fetch(`/api/feedbacks/submit/${qrUrl}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, comment: comment.trim() || null }),
+        body: JSON.stringify({
+          rating,
+          comment: comment.trim() || null,
+          reviewer_name: reviewerName.trim() || null,
+          reviewer_email: reviewerEmail.trim() || null,
+        }),
       })
 
       if (!res.ok) {
@@ -60,11 +68,16 @@ export function FeedbackForm({ qrUrl, qrName, qrLocation }: FeedbackFormProps) {
             </div>
             <h2 className="text-2xl font-bold text-foreground mb-2">Merci pour votre avis !</h2>
             <p className="text-muted-foreground mb-6">Votre retour nous aide à améliorer notre service.</p>
+            {reviewerName && (
+              <p className="text-sm text-muted-foreground mb-4">Merci {reviewerName}, votre avis a été enregistré.</p>
+            )}
             <Button
               variant="outline"
               onClick={() => {
                 setRating(0)
                 setComment("")
+                setReviewerName("")
+                setReviewerEmail("")
                 setFormState("idle")
               }}
             >
@@ -90,7 +103,7 @@ export function FeedbackForm({ qrUrl, qrName, qrLocation }: FeedbackFormProps) {
           <CardContent className="space-y-6">
             {/* Error message */}
             {formState === "error" && (
-              <div className="flex items-center gap-2 p-3 text-sm text-danger bg-danger/10 rounded-lg animate-in fade-in duration-200">
+              <div className="flex items-center gap-2 p-3 text-sm text-destructive bg-destructive/10 rounded-lg animate-in fade-in duration-200">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 {errorMessage}
               </div>
@@ -104,13 +117,51 @@ export function FeedbackForm({ qrUrl, qrName, qrLocation }: FeedbackFormProps) {
               <StarRating rating={rating} onChange={setRating} />
             </div>
 
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="reviewer-name"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+                >
+                  <User className="h-4 w-4" />
+                  Votre nom (optionnel)
+                </Label>
+                <Input
+                  id="reviewer-name"
+                  placeholder="Jean Dupont"
+                  value={reviewerName}
+                  onChange={(e) => setReviewerName(e.target.value)}
+                  maxLength={100}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="reviewer-email"
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+                >
+                  <Mail className="h-4 w-4" />
+                  Email (optionnel)
+                </Label>
+                <Input
+                  id="reviewer-email"
+                  type="email"
+                  placeholder="jean@example.com"
+                  value={reviewerEmail}
+                  onChange={(e) => setReviewerEmail(e.target.value)}
+                  maxLength={255}
+                />
+                <p className="text-xs text-muted-foreground">Pour recevoir une réponse à votre avis</p>
+              </div>
+            </div>
+
             {/* Comment */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Label htmlFor="comment" className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <MessageSquare className="h-4 w-4" />
                 Commentaire (optionnel)
-              </div>
+              </Label>
               <Textarea
+                id="comment"
                 placeholder="Partagez votre expérience..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}

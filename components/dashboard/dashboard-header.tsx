@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { QrCode, LayoutDashboard, ChevronDown, LogOut, User, Settings, Bell } from "lucide-react"
+import { QrCode, LayoutDashboard, ChevronDown, LogOut, User, Settings, Bell, Trophy, Star } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface DashboardHeaderProps {
@@ -36,6 +36,8 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/qr-codes", label: "QR Codes", icon: QrCode },
+    { href: "/top-feedbacks", label: "Top Avis", icon: Star },
+    { href: "/rankings", label: "Classements", icon: Trophy },
     { href: "/alerts", label: "Alertes", icon: Bell },
   ]
 
@@ -56,7 +58,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
               const isActive = pathname === item.href
               return (
                 <Link key={item.href} href={item.href}>
-                  <Button variant="ghost" className={cn("gap-2", isActive && "bg-muted text-foreground")}>
+                  <Button variant="ghost" size="sm" className={cn("gap-2", isActive && "bg-muted text-foreground")}>
                     <Icon className="h-4 w-4" />
                     {item.label}
                   </Button>
@@ -88,31 +90,24 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="md:hidden" asChild>
-                  <Link href="/dashboard">
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Dashboard
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="md:hidden" asChild>
-                  <Link href="/qr-codes">
-                    <QrCode className="h-4 w-4 mr-2" />
-                    QR Codes
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="md:hidden" asChild>
-                  <Link href="/alerts">
-                    <Bell className="h-4 w-4 mr-2" />
-                    Alertes
-                  </Link>
-                </DropdownMenuItem>
+                {navItems.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <DropdownMenuItem key={item.href} className="md:hidden" asChild>
+                      <Link href={item.href}>
+                        <Icon className="h-4 w-4 mr-2" />
+                        {item.label}
+                      </Link>
+                    </DropdownMenuItem>
+                  )
+                })}
                 <DropdownMenuSeparator className="md:hidden" />
                 <DropdownMenuItem>
                   <Settings className="h-4 w-4 mr-2" />
                   Paramètres
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-danger">
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="h-4 w-4 mr-2" />
                   Déconnexion
                 </DropdownMenuItem>
